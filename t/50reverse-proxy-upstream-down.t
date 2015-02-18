@@ -19,7 +19,9 @@ hosts:
 @{[ $persistent ? "" : "proxy.timeout.keepalive: 2000" ]}
 EOT
     my $port = $server->{port};
+system("date");
     my $res = `curl --max-time 5 --silent --dump-header /dev/stderr http://127.0.0.1:$port/ 2>&1 > /dev/null`;
+system("date");
     like $res, qr{^HTTP/1\.1 502 }, "502 response on upstream error";
 };
 

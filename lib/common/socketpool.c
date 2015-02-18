@@ -125,6 +125,8 @@ void h2o_socketpool_set_timeout(h2o_socketpool_t *pool, h2o_loop_t *loop, uint64
 static void on_deferred_connect_cb(h2o_timeout_entry_t *timeout)
 {
     h2o_socketpool_connect_request_t *req = H2O_STRUCT_FROM_MEMBER(h2o_socketpool_connect_request_t, timeout, timeout);
+fprintf(stderr, "Hmm:%s:%d\n", __FILE__, __LINE__);
+fprintf(stderr, "Hmm:%s:%d:%s\n", __FILE__, __LINE__, req->errstr);
     assert(req->cb != NULL);
     (req->cb)(req->sock, req->errstr, req->data);
     free(req);
@@ -204,11 +206,13 @@ h2o_socketpool_connect_request_t *h2o_socketpool_connect(h2o_socketpool_t *pool,
         }
         /* start connecting */
         if ((sock = h2o_socket_connect(loop, res->ai_addr, res->ai_addrlen, on_connect)) == NULL) {
+fprintf(stderr, "Hmm:%s:%d\n", __FILE__, __LINE__);
             req = setup_connect_callback(cb, NULL, "failed to connect to host", data);
             h2o_timeout_link(loop, zero_timeout, &req->timeout);
             goto ExitConnect;
         }
         /* socket is ready, setup callbacks and update pool counter */
+fprintf(stderr, "Hmm:%s:%d\n", __FILE__, __LINE__);
         req = setup_connect_callback(cb, sock, NULL, data);
         sock->data = req;
         sock->on_close.cb = on_close;

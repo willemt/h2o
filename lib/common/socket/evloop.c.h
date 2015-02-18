@@ -395,6 +395,7 @@ h2o_socket_t *h2o_socket_connect(h2o_loop_t *loop, struct sockaddr *addr, sockle
 #endif
     fcntl(fd, F_SETFL, O_NONBLOCK);
     if (!(connect(fd, addr, addrlen) == 0 || errno == EINPROGRESS)) {
+fprintf(stderr, "Hmm:%s:%d:%d\n", __FILE__, __LINE__, errno);
         close(fd);
         return NULL;
     }
