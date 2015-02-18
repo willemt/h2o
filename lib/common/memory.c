@@ -60,6 +60,7 @@ void h2o_fatal(const char *msg)
     abort();
 }
 
+#include <pthread.h>
 void *h2o_mem_alloc_recycle(h2o_mem_recycle_t *allocator, size_t sz)
 {
     struct st_h2o_mem_recycle_chunk_t *chunk;
@@ -67,6 +68,7 @@ void *h2o_mem_alloc_recycle(h2o_mem_recycle_t *allocator, size_t sz)
         return h2o_mem_alloc(sz);
     /* detach and return the pooled pointer */
     chunk = allocator->_link;
+fprintf(stderr, "%p:%s:%p:%zu\n", (void *)pthread_self(), __FUNCTION__, chunk, allocator->cnt);
     assert(chunk != NULL);
     allocator->_link = chunk->next;
     --allocator->cnt;
@@ -80,6 +82,7 @@ void h2o_mem_free_recycle(h2o_mem_recycle_t *allocator, void *p)
         free(p);
         return;
     }
+fprintf(stderr, "%p:%s:%p:%zu\n", (void *)pthread_self(), __FUNCTION__, p, allocator->cnt + 1);
     /* register the pointer to the pool */
     chunk = p;
     chunk->next = allocator->_link;
